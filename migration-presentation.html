@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Migrating 500M Rows: PostgreSQL to ClickHouse</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/white.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
+    <style>
+        .reveal section.img_container {
+            width: auto;
+            height: 60%;
+        }
+
+        .reveal section img {
+            display: block;
+            margin: auto;
+            height: auto;
+            /* max-height: 100%; */
+            width: auto;
+            /* max-width: 100%; */
+        }
+
+
+        .left {
+            left: -8.33%;
+            text-align: left;
+            float: left;
+            width: 49.5%;
+            z-index: -10;
+        }
+
+        .right {
+            left: 31.25%;
+            top: 75px;
+            float: right;
+            text-align: right;
+            z-index: -10;
+            width: 49.5%;
+        }
+
+        .reveal .slides section {
+            text-align: left;
+        }
+
+        .reveal h1,
+        .reveal h2,
+        .reveal h3 {
+            text-align: center;
+        }
+
+        .reveal pre code {
+            max-height: 500px;
+        }
+
+        .reveal pre {
+            font-size: 0.5em;
+            width: 100%;
+        }
+
+        .reveal {
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        .reveal code {
+            font-size: 0.8em;
+        }
+
+        .highlight-red {
+            color: #ff6b6b;
+        }
+
+        .highlight-green {
+            color: #51cf66;
+        }
+
+        .highlight-yellow {
+            color: #ffd43b;
+        }
+
+        .small-text {
+            font-size: 0.8em;
+        }
+
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section data-markdown="slides.md" data-separator="^\r?\n---\r?\n$" data-separator-vertical="^\r?\n--\r?\n$"
+                data-separator-notes="^Note:" data-charset="utf-8">
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            // transition: 'scroll',
+            slideNumber: 'c/t',
+            transitionSpeed: 'default',
+            backgroundTransition: 'fade',
+            plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+            highlight: {
+                highlightOnLoad: true
+            }
+        });
+    </script>
+</body>
+
+</html>
