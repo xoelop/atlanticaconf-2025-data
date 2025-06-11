@@ -39,7 +39,7 @@
             left: 31.25%;
             top: 75px;
             float: right;
-            text-align: right;
+            text-align: left;
             z-index: -10;
             width: 49.5%;
         }
@@ -58,17 +58,21 @@
             max-height: 500px;
         }
 
+        .reveal .code-wrapper code {
+            white-space: pre-wrap;
+        }
+
         .reveal pre {
             font-size: 0.5em;
             width: 100%;
         }
 
         .reveal {
-            font-family: 'Bebas Neue', sans-serif;
+            font-family: 'Helvetica Neue', sans-serif;
         }
 
         .reveal code {
-            font-size: 0.8em;
+            font-size: 0.7em;
         }
 
         .highlight-red {
@@ -83,6 +87,10 @@
             color: #ffd43b;
         }
 
+        .highlight-orange {
+            color: #ff9f1c;
+        }
+
         .small-text {
             font-size: 0.8em;
         }
@@ -90,17 +98,54 @@
         .center {
             text-align: center;
         }
+
+        /* base style for the three fixed captions */
+        .corner-text {
+            position: fixed;
+            top: 12px;
+            font-size: 1em;       /* "small" text */
+            color: #777;
+            font-family: 'Helvetica Neue', sans-serif;
+            letter-spacing: .05em;
+            pointer-events: none;
+               /* don't block clicks / key nav */
+            z-index: 1000;
+        }
+
+        .corner-text-right {
+            right: 20px;
+        }
+
+        .corner-text-left {
+            left: 20px;
+        }
+
+        .corner-text-center {
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
     </style>
 </head>
 
 <body>
     <div class="reveal">
         <div class="slides">
-            <section data-markdown="slides.md" data-separator="^\r?\n---\r?\n$" data-separator-vertical="^\r?\n--\r?\n$"
-                data-separator-notes="^Note:" data-charset="utf-8">
+            <section 
+                data-markdown="slides.md" 
+                data-separator="^\r?\n*---*\r?\n$" 
+                data-separator-vertical="^\r?\n*--*\r?\n$"
+                data-separator-notes="^Note:" 
+                data-charset="utf-8"
+                data-background-image="./media/bg-ts.png"
+            >
             </section>
         </div>
     </div>
+
+    <div class="corner-text corner-text-right"><a href="https://theirstack.com"></a>TheirStack.com</a></div>
+    <div class="corner-text corner-text-left">@xoelipedes</div>
+    <!-- <div class="corner-text corner-text-center">Migrating 500M rows from Postgres to ClickHouse</div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/notes/notes.js"></script>
@@ -109,7 +154,9 @@
     <script>
         Reveal.initialize({
             hash: true,
-            // transition: 'scroll',
+            transition: 'scroll',
+            width: 1200,
+            height: 700,
             view: 'scroll',
             scrollProgress: 'true',
             slideNumber: 'c/t',
