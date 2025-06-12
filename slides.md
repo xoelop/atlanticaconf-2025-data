@@ -26,10 +26,10 @@
 
 ## Hiring: Data Engineer - up to 80k €
 
-<center style="margin-bottom: 20px;"><a href="https://dub.sh/ts-data-engineer">https://dub.sh/ts-data-engineer</a></center>
+<center style="margin-bottom: 20px;"><a href="https://github.com/TheirStack/data-engineer-2025-test">https://github.com/TheirStack/data-engineer-2025-test</a></center>
 
 
-<img src="./media/qr.png" data-preview-image style="max-height: 400px;">
+<img src="./media/qr-gh-repo.png" data-preview-image style="max-height: 400px;">
 
 
 --
@@ -694,7 +694,7 @@ But if most of the data is going to come from a few parts, settings max_threads 
 <img src="./media/connected_components.gif" data-preview-image style="max-height: 600px;">
 
 
-<img src="./media/qr.png" data-preview-image style="max-height: 400px;">
+<img src="./media/qr-gh-repo.png" data-preview-image style="max-height: 400px;">
 
 </div>
 
@@ -705,4 +705,4 @@ But if most of the data is going to come from a few parts, settings max_threads 
 
 
 <p class="center">Thank you!</p> 
-<img src="./media/qr.png" data-preview-image style="max-height: 250px;">
+<img src="./media/qr-gh-repo.png" data-preview-image style="max-height: 250px;">
