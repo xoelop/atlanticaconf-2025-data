@@ -5,35 +5,75 @@
 
 ---
 
-## The Scale
+## About me
 
-- **110 million** jobs
-- **5 million** companies  
-- **30k** technologies tracked
-- **500M+** rows to migrate
+<div class="left">
+
+- Before at Inditex, Narrativa, Tinybird  
+- TheirStack since 2020  
+
+
+</div>
+ 
+<div class="right">
+
+<img src="./media/me.jpg" data-preview-image style="max-height: 200px;">
+
+</div>
 
 
 --
 
-## Row-based VS column-based
+## Hiring: Data Engineer - up to 80k €
 
-<img src="./media/row-vs-column-dbs.png" data-preview-image style="max-height: 500px;">
+<center style="margin-bottom: 20px;"><a href="https://dub.sh/ts-data-engineer">https://dub.sh/ts-data-engineer</a></center>
+
+
+<img src="./media/qr.png" data-preview-image style="max-height: 400px;">
+
+
+--
+
+## What is TheirStack?
+
+- Originally [NoiceJobs.com](https://noicejobs.com)
+- Global DB of jobs and companies
+- 6M new jobs per month, 6M companies in total, 30k technologies
+- Jobs = powerful intent signals -> ROI of sales & marketing campaigns 🚀
+
+Note: 
+- Database of jobs and companies worldwide
+- Not to help people find jobs or companies find candidates -> to help companies maximize the ROI of their sales & marketing campaigns
+- Signals in jobs:
+  - technologies mentioned
+  - intents like 'AI', 'LLM', etc
+  - titles: hiring SDRs if you have a 
+
+--
+
+## Talk structure
+
+- Postgres: 
+  - interpreting an EXPLAIN query
+  - Partitioning
+  - Use case: searches on job descriptions
+  - Materialized views
+  - Limitations
+- Row-based vs column-based databases
+- ClickHouse, optimizing queries:
+  - Filtering first
+  - ORDER BY direction
+  - Including large columns in the result
+  - Lazy materialization
+  - CTE trick to get keys first
+  - Projections
+- ClickHouse: next steps
 
 
 ---
 
-## PostgreSQL: the struggles
 
-1. Indexing on many columns
-2. Index size
-3. Updates on all rows
-4. Table partitioning
-5. RAM needs
-6. Arquitecture
-
---
-
-### Indexing issues
+### PostgreSQL: our hero journey
 
 1. 🙂 We add a field
 2. 😅 Users want to filter by it
@@ -43,17 +83,44 @@
 
 --
 
-### Solution? Partitioning...?
+### How much data a query reads?
+
+<p class="small-text">`EXPLAIN (ANALYZE, BUFFERS) ...` is your friend</p>
+
+```sql
+ Finalize Aggregate  (cost=158141.07..158141.08 rows=1 width=8) (actual time=37789.355..37792.597 rows=1 loops=1)
+   Buffers: shared hit=2998 read=447971 dirtied=4285
+   I/O Timings: shared read=185052.710
+   ->  Gather  (cost=158140.65..158141.06 rows=4 width=8) (actual time=37717.836..37792.558 rows=5 loops=1)
+         Workers Planned: 4
+         Workers Launched: 4
+         Buffers: shared hit=2998 read=447971 dirtied=4285
+         I/O Timings: shared read=185052.710
+         ->  Partial Aggregate  (cost=157140.65..157140.66 rows=1 width=8) (actual time=37702.154..37702.163 rows=1 loops=5)
+               Buffers: shared hit=2998 read=447971 dirtied=4285
+               I/O Timings: shared read=185052.710
+               ->  Parallel Append  (cost=0.43..152800.69 rows=1735985 width=0) (actual time=58.178..37619.362 rows=1382171 loops=5)
+                     Buffers: shared hit=2998 read=447971 dirtied=4285
+                     I/O Timings: shared read=185052.710
+                     ->  Parallel Index Only Scan using ix_job_remote on job_old job_1  (cost=0.56..34101.92 rows=649969 width=0) (actual time=65.153..7230.452 rows=2
+542574 loops=1)
+                           Index Cond: (remote = true)
+```
+
+<p class="small-text">Data read in bytes: (shared hit + read + dirtied) * 8KB (page size) = ...</p>
+
+--
+
+### How to make indices fit in RAM -> partitioning
 
 - Jobs table -> `jobs_2024_01, jobs_2024_02, ...`  
 <!--- ![partitioning](./media/partitioning.png) -->
 
 ![](./media/db-partitioning.webp)
 
-
 --
 
-### Partitioning: simple version
+<!-- ### Partitioning: simple version
 
 
 Simple version
@@ -75,17 +142,17 @@ CREATE TABLE public.job_2024_01 PARTITION OF public.job FOR
     VALUES FROM ('2024-01-01') TO ('2024-02-01');
 ...
 ```
-<p class="highlight-orange">⚠️ Partitions aren't created automatically</p>
+<p class="highlight-orange">⚠️ Partitions aren't created automatically</p> -->
 
---
+<!-- -- -->
 
-### Partitioning: gotchas
+<!-- ### Partitioning: gotchas
 
-<blockquote class="small-text">To create a unique or primary key constraint on a partitioned table, the partition keys must not include any expressions or function calls and the constraint's columns must include all of the partition key columns... - <a href="https://www.postgresql.org/docs/current/ddl-partitioning.html#DDL-PARTITIONING-DECLARATIVE-LIMITATIONS">source</a></blockquote>
+<blockquote class="small-text">To create a unique or primary key constraint on a partitioned table, the partition keys must not include any expressions or function calls and the constraint's columns must include all of the partition key columns... - <a href="https://www.postgresql.org/docs/current/ddl-partitioning.html#DDL-PARTITIONING-DECLARATIVE-LIMITATIONS">source</a></blockquote> -->
 
---
+<!-- -- -->
 
-### Partitioning: extra work
+<!-- ### Partitioning: extra work
 
 Before creating partitions:
 1. Drop constraints
@@ -93,9 +160,9 @@ Before creating partitions:
 And after:
 1. Recreate constraints
 2. Drop triggers on initial partition
-3. Recreate triggers on new table
+3. Recreate triggers on new table --> 
 
---
+<!-- -- -->
 
 ### Partitioning: indices
 
@@ -141,36 +208,21 @@ CREATE INDEX CONCURRENTLY ix_job_easy_apply ON job (easy_apply);
 
 --
 
+## Use case: regex searches on job descriptions
 
-### How much data a query reads?
-
-<p class="small-text">`EXPLAIN (ANALYZE, BUFFERS) ...` is your friend</p>
-
+🥴 Approach 1: trigram indices. After 2M jobs - unfeasible.  
 ```sql
- Finalize Aggregate  (cost=158141.07..158141.08 rows=1 width=8) (actual time=37789.355..37792.597 rows=1 loops=1)
-   Buffers: shared hit=2998 read=447971 dirtied=4285
-   I/O Timings: shared read=185052.710
-   ->  Gather  (cost=158140.65..158141.06 rows=4 width=8) (actual time=37717.836..37792.558 rows=5 loops=1)
-         Workers Planned: 4
-         Workers Launched: 4
-         Buffers: shared hit=2998 read=447971 dirtied=4285
-         I/O Timings: shared read=185052.710
-         ->  Partial Aggregate  (cost=157140.65..157140.66 rows=1 width=8) (actual time=37702.154..37702.163 rows=1 loops=5)
-               Buffers: shared hit=2998 read=447971 dirtied=4285
-               I/O Timings: shared read=185052.710
-               ->  Parallel Append  (cost=0.43..152800.69 rows=1735985 width=0) (actual time=58.178..37619.362 rows=1382171 loops=5)
-                     Buffers: shared hit=2998 read=447971 dirtied=4285
-                     I/O Timings: shared read=185052.710
-                     ->  Parallel Index Only Scan using ix_job_remote on job_old job_1  (cost=0.56..34101.92 rows=649969 width=0) (actual time=65.153..7230.452 rows=2
-542574 loops=1)
-                           Index Cond: (remote = true)
+CREATE INDEX ix_job_description_trgm ON job USING gin (description  gin_trgm_ops)
 ```
-
-<p class="small-text">Data read in bytes: (shared hit + read + dirtied) * 8KB (page size) = ...</p>
+👍 Approach 2: replicate jobs table in [Tinybird](https://tinybird.co/) and query IDs in Postgres
+```sql
+SELECT * FROM job WHERE id IN (...)
+```
+You can't pass more than 65535 parameters in a parameterized query in Postgres. Unnest works, but it's slow.
 
 --
 
-### Materialized views in PostgreSQL
+### Aggregations in Postgres: Materialized views
 
 - Large MVs are slow to calculate
 - Physical order matters **a lot**
@@ -192,32 +244,41 @@ COMMIT;
 
 --
 
-## Row-based
 
-<center><img src="./media/row-based.gif"></center>
+## Row-based VS column-based DBs
 
---
-
-## Column-based
-
-<center><img src="./media/column-based.gif""></center>
+<img src="./media/row-vs-column-dbs.png" data-preview-image style="max-height:600px;">
 
 
 --
+
 
 ## Some ClickHouse peculiarities
 
-Many trade-offs were made to make CH fast:
+Besides row vs column approach, more trade-offs were made to make CH fast:
 
 - No unique constraints
 - No primary key as in OLTP DBs
-- No row-level indices
-- Granules: groups of N rows
-- Each insert generates 1 part per partition
+- No row-level indices. Only granule-level
+- No query planner
+
+<!-- <img src="./media/no-query-planner.jpg" data-preview-image style="max-height:600px;"> -->
 
 --
 
-## ClickHouse tips:
+## ClickHouse: MergeTree
+
+<img src="./media/merges.png" data-preview-image style="max-height:600px;">
+
+--
+
+## ClickHouse: Merges
+
+<img src="./media/merges-2.png" data-preview-image style="max-height:600px;">
+
+--
+
+## ClickHouse tips: 
 
 - How data is store in disk matters a lot
 - Sorting key: column most used to filter first
@@ -225,12 +286,11 @@ Many trade-offs were made to make CH fast:
 - Partitions are created automatically
 - Inserts can't hit more than 100 partitions -> up to 100 parts created on each insert
 
-## ClickHouse query optimization
-
 --
 
-### Jobs table: first schema design
+## ClickHouse: optimizing queries
 
+<div class="right">
 
 ```sql
 CREATE TABLE job_2
@@ -250,8 +310,64 @@ PARTITION BY toYYYYMM(posted_at)
 ORDER BY (posted_at, url_hashed)
 SAMPLE BY url_hashed
 ```
+</div>
+
+<div class="left">
+
+<img src="./media/jobs_sample_columns.png" data-preview-image style="max-height:600px;">
+
+</div>
+
+
+
+
+---
+
+
+### Select * where ... 💀
+
+
+
+```sql
+SELECT *
+FROM job_2
+WHERE has(title_tokenized, 'kafka') 
+ORDER BY posted_at DESC
+LIMIT 100
+FORMAT NULL
+
+0 rows in set. Elapsed: 49.349 sec. Processed 51.79 million rows, 6.89 GB (1.05 million rows/s., 139.57 MB/s.)
+Peak memory usage: 7.99 GiB.
+```
+
+PREWHERE optimization theoretically could help, but didn't seem effective in our case
 
 --
+
+
+## Filter first
+
+... if possible, by the first column of the sorting key
+
+```sql
+SELECT *
+FROM job_2 
+WHERE has(title_tokenized, 'kafka') 
+    AND posted_at BETWEEN now()::date - INTERVAL '1 month' AND now()::date
+ORDER BY posted_at DESC
+LIMIT 100
+FORMAT NULL
+
+0 rows in set. Elapsed: 3.551 sec. Processed 5.13 million rows, 693.93 MB (1.45 million rows/s., 195.43 MB/s.)
+Peak memory usage: 1.06 GiB.
+```
+
+- In ClickHouse it's key to match the table schema to the most common queries you'll do.  
+- LinkedIn, Indeed... filter by the last day/7d/month by default for a reason!
+
+
+--
+
 
 ### Does the ORDER BY direction matter?
 
@@ -260,7 +376,7 @@ SAMPLE BY url_hashed
 ```sql
 SELECT posted_at, url_hashed, title
 FROM job_2
-WHERE has(title_tokenized, 'snake')
+WHERE has(title_tokenized, 'kafka')
 ORDER BY posted_at ASC
 LIMIT 100
 FORMAT NULL
@@ -272,7 +388,7 @@ FORMAT NULL
 ```sql
 SELECT posted_at, url_hashed, title
 FROM job_2
-WHERE has(title_tokenized, 'snake')
+WHERE has(title_tokenized, 'kafka')
 ORDER BY posted_at DESC
 LIMIT 100
 FORMAT NULL
@@ -288,7 +404,7 @@ FORMAT NULL
 ```sql
 SELECT posted_at, url_hashed, title
 FROM job_2
-WHERE has(title_tokenized, 'snake')
+WHERE has(title_tokenized, 'kafka')
 ORDER BY posted_at ASC
 LIMIT 100
 FORMAT NULL
@@ -303,7 +419,7 @@ Peak memory usage: 248.96 MiB.
 ```sql
 SELECT posted_at, url_hashed, title
 FROM job_2
-WHERE has(title_tokenized, 'snake')
+WHERE has(title_tokenized, 'kafka')
 ORDER BY posted_at DESC
 LIMIT 100
 FORMAT NULL
@@ -320,7 +436,7 @@ Peak memory usage: 70.39 MiB.
 
 ### Does the ORDER BY direction matter?
 
-Before 24.12:
+Before 24.12: order by -toUnixTimestamp(posted_at)
 
 <div class="left">
 
@@ -347,7 +463,7 @@ SAMPLE BY url_hashed
 ```sql
 SELECT posted_at, url_hashed, title
 FROM job 
-WHERE has(title_tokenized, 'snake') 
+WHERE has(title_tokenized, 'kafka') 
 ORDER BY neg_posted_at_timestamp 
 LIMIT 100
 FORMAT NULL 
@@ -381,68 +497,44 @@ SAMPLE BY url_hashed
 SETTINGS allow_experimental_reverse_key=1
 ```
 
----
+--
 
 
-### Select * where ... 💀
+### Including large columns in the result = 💀
 
-- <p class="highlight-orange">Even with WHERE and LIMIT clauses, adding large columns to a select query will slow it down</p>
+ClickHouse originally designed for analytics!
 
+<img src="./media/column-based.gif" data-preview-image style="max-height: 400px;">
 
-```sql
-SELECT *
-FROM job 
-WHERE has(title_tokenized, 'kafka') 
-ORDER BY neg_posted_at_timestamp, url_hashed
-LIMIT 100
-FORMAT NULL
-
-0 rows in set. Elapsed: 49.349 sec. Processed 51.79 million rows, 6.89 GB (1.05 million rows/s., 139.57 MB/s.)
-Peak memory usage: 7.99 GiB.
-```
-
-PREWHERE optimization theoretically could help, but didn't seem effective in our case
+But also [beats ElasticSearch](https://clickhouse.com/blog/clickhouse_vs_elasticsearch_the_billion_row_matchup) for search use cases
 
 --
 
 ### Including large columns in the result = 💀
 
+- <p class="highlight-orange">Even with WHERE and LIMIT clauses, adding large columns to a select query will slow it down</p>
 
 This is an issue known for years:  
 - [Massive slowdown when simply including a (large) column in the result](https://github.com/ClickHouse/ClickHouse/issues/7187) 
 - [Clickhouse scanning huge amount of data while querying parquet files even in the latest build which has predicate pushdown](https://github.com/ClickHouse/ClickHouse/issues/54977) 
 
 But there are some good news..
+
 --
+
+
+### Lazy materialization 🥳
+
+[Introduced in ClickHouse 25.4](https://clickhouse.com/blog/clickhouse-gets-lazier-and-faster-introducing-lazy-materialization)
+
+300-1200x speedup in some queries
+
+<img src="./media/lazy-materialization.png" data-preview-image style="max-height: 400px;">
+
+--
+
 
 ### A temporal solution before 25.4
-
-👍 ~10x speedup over just `SELECT *`  
-👎 Syntax so ugly it hurts your eyes
-```sql
-WITH rows_cte AS (
-    SELECT neg_posted_at_timestamp, url_hashed
-    FROM job
-    WHERE has(title_tokenized, 'kafka')
-    ORDER BY neg_posted_at_timestamp, url_hashed
-    LIMIT 100
-), filtered_rows AS (
-    SELECT * FROM job
-    WHERE (neg_posted_at_timestamp, url_hashed) IN (
-        SELECT neg_posted_at_timestamp, url_hashed FROM rows_cte
-    )
-)
-SELECT * FROM filtered_rows
-ORDER BY neg_posted_at_timestamp, url_hashed
-
-0 rows in set. Elapsed: 4.743 sec. Processed 92.50 million rows, 7.23 GB (19.50 million rows/s., 1.53 GB/s.)
-Peak memory usage: 615.70 MiB.
-```
-
---
-
-### Always filter first, if possible
-<p class="small-text">... and if you filter by the main column of the sorting key, better</p>
 
 
 <div style="display: flex; justify-content: space-between;">
@@ -493,91 +585,59 @@ Peak memory usage: 166.81 MiB.
 
 --
 
-### Lazy materialization 🥳
-
-[Introduced in ClickHouse 25.4](https://clickhouse.com/blog/clickhouse-gets-lazier-and-faster-introducing-lazy-materialization)
-
-300-1200x speedup in some queries
-
-<img src="./media/lazy-materialization.png" data-preview-image style="max-height: 400px;">
-
---
-
 ## Projections
 
-```sql
-CREATE TABLE company_keyword
-(
-    `keyword_slug` LowCardinality(String),
-    `company_name` String,
-    `confidence` Enum8('low' = 1, 'medium' = 2, 'high' = 3),
-    `jobs` UInt32,
-    ...
-    PROJECTION sorted_company_name
-    (
-        SELECT *
-        ORDER BY 
-            company_name,
-            confidence,
-            jobs
-    )
-)
-ENGINE = MergeTree
-ORDER BY (keyword_slug, confidence, jobs)
-```
-
---
-
-### Projections: performance comparisons:
-
 <div class="left">
-With projection:
 
-
-```sql
-SELECT *
-FROM company_keyword
-WHERE company_name = 'Apple'
-FORMAT `NULL`
-SETTINGS optimize_use_projections = 0
-
-
-0 rows in set. Elapsed: 1.846 sec. Processed 31.70 million rows, 1.35 GB (17.17 million rows/s., 732.40 MB/s.)
-```
+<img src="./media/jobs_sample.png" data-preview-image style="max-height: 400px;">
 
 </div>
 
 <div class="right">
-Without projection:
+
+<img src="./media/jobs_projection.png" data-preview-image style="max-height: 400px;">
+
+</div>
+
+--
+
+## Impact of max_threads
+
+
+<div style="display: flex; justify-content: space-between;">
+<div style="width: 40%;">
 
 ```sql
-SELECT *
-FROM company_keyword
-WHERE company_name = 'Apple'
-FORMAT `NULL`
-SETTINGS optimize_use_projections = 1
-
-
-0 rows in set. Elapsed: 0.611 sec. Processed 32.77 thousand rows, 3.78 MB (53.63 thousand rows/s., 6.18 MB/s.)
-Peak memory usage: 14.23 MiB.
+SELECT 
+    neg_posted_at_timestamp
+    , url_hashed
+    , company_name
+FROM job
+WHERE neg_posted_at_timestamp >= - toUnixTimestamp('2025-06-12')
+    AND multiMatchAny(description, ['(?i)python'])
+    AND neg_posted_at_timestamp <= - toUnixTimestamp('2025-03-14')
+ORDER BY neg_posted_at_timestamp,
+    url_hashed,
+    updated_at DESC
+LIMIT 0, 10
+SETTINGS max_threads=1
 ```
 </div>
 
-- 3x speedup
-- 50x less memory usage
+
+
+<img src="./media/max_threads_stats.png" data-preview-image style="max-height: 600px;">
+
+
+</div>
+
+Note: One of CH's strongest points is that it can parallelize reads very well. Higher max_threads = more reads in parallel. 
+But if most of the data is going to come from a few parts, settings max_threads higher than that won't make it faster, you'll just waste CPU cycles reading parts you won't need.
+
+
 
 --
 
-## Partitioning
-
-CH recommendation: partitions don't speed up queries (like in Postgres). Use partitioning only for data management (deleting old data, moving to cheaper storage, etc)
-
-Reality: if a partition is > 150MB, merges won't happen.
-
-You'll likely need partitioning.
-
-
---
 
 ## Some rules of thumb
 
@@ -587,24 +647,15 @@ You'll likely need partitioning.
 - More parts = more memory and CPU needed for merges
 - Higher max_threads for a query = faster queries...
   - But other queries may be affected and fail with OOM errors
+- If the query has the same order by as the table, you need to force projection usage with optimize_read_in_order=0
+- You can't insert into more than 100 partitions at once
+- Partitions > 150GB -> merges won't happen
 
 ---
 
-## Upserts: The Challenge
+## ClickHouse: what didn't work... yet?
 
-Options:
-- `FINAL` modifier: not suitable for real-world data
-- ReplacingMergeTree: after many days had passed, we still had duplicates.
-  - For RMT to work, you'll need to overprovision your machine.
-- AggregatingMergeTree + argMax
-- Periodical snapshots + UNION  with real-time data
-- Promising: [lightweight updates](https://clickhouse.com/blog/highlights-from-open-house-our-first-user-conference#lightweight-updates) (25.7+)
-
---
-
-## ClickHouse: what didn't work?
-
-- ❌ SET index on company name in job table -> projection
+- ❌ SET index on company name in job table ✅ projection
 - ❌ Upserts -> not inserting updated data for now
 - ❌ ngrambf filters on job description
 - ❌ more concurrent queries -> OOM errors (in Postgres: just slower queries)
@@ -625,7 +676,7 @@ Options:
 
 ---
 
-## 🤑
+## Hiring a Data Engineer  (up to 80k €)
 
 <div style="display: flex; justify-content: space-between;">
 
