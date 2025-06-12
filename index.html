@@ -95,6 +95,10 @@
             font-size: 0.8em;
         }
 
+        .extra-small-text {
+            font-size: 0.6em;
+        }
+
         .center {
             text-align: center;
         }
@@ -125,6 +129,16 @@
             transform: translateX(-50%);
             white-space: nowrap;
         }
+
+        .qr-bottom-right {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 120px;      /* Adjust size as needed */
+            height: 120px;     /* Adjust size as needed */
+            z-index: 10;    /* Above other elements */
+            pointer-events: none; /* So it doesn't block navigation/clicks */
+        }
     </style>
 </head>
 
@@ -143,9 +157,11 @@
         </div>
     </div>
 
+    <img src="media/bit.ly_ch-atlantica-25.png" class="qr-bottom-right" alt="QR code to bit.ly/ch-atlantica-25" />
+
     <div class="corner-text corner-text-right"><a href="https://theirstack.com"></a>TheirStack.com</a></div>
     <div class="corner-text corner-text-left">@xoelipedes</div>
-    <!-- <div class="corner-text corner-text-center">Migrating 500M rows from Postgres to ClickHouse</div> -->
+    <!-- <div class="corner-text corner-text-center">Migrating 500 rows from Postgres to ClickHouse</div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/dist/reveal.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.0/plugin/notes/notes.js"></script>
