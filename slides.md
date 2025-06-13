@@ -54,31 +54,9 @@ Note:
 ## Talk structure
 
 
-<div class="extra-small-text">
-<ul>
-  <li>Postgres:
-    <ul>
-      <li>interpreting an EXPLAIN query</li>
-      <li>Partitioning</li>
-      <li>Use case: searches on job descriptions</li>
-      <li>Materialized views</li>
-      <li>Limitations</li>
-    </ul>
-  </li>
-  <li>Row-based vs column-based databases</li>
-  <li>ClickHouse, optimizing queries:
-    <ul>
-      <li>Filtering first</li>
-      <li>ORDER BY direction</li>
-      <li>Including large columns in the result</li>
-      <li>Lazy materialization</li>
-      <li>CTE trick to get keys first</li>
-      <li>Projections</li>
-    </ul>
-  </li>
-  <li>ClickHouse: next steps</li>
-</ul>
-</div>
+- Learnings working Postgres
+- Why we migrated to ClickHouse
+- Learnings working with ClickHouse
 
 
 ---
