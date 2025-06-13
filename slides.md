@@ -55,7 +55,7 @@ Note:
 ## Talk structure
 
 
-- Learnings working Postgres
+- Learnings working with Postgres
 - Why we migrated to ClickHouse
 - Learnings working with ClickHouse
 
