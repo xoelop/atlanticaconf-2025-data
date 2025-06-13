@@ -22,14 +22,6 @@
 </div>
 
 
---
-
-## Hiring: Data Engineer - up to 80k €
-
-<center style="margin-bottom: 20px;"><a href="https://github.com/TheirStack/data-engineer-2025-test">https://github.com/TheirStack/data-engineer-2025-test</a></center>
-
-
-<img src="./media/qr-gh-repo.png" data-preview-image style="max-height: 400px;">
 
 
 --
@@ -50,6 +42,15 @@ Note:
   - titles: hiring SDRs if you have a 
 
 --
+
+## Hiring: Data Engineer - up to 80k €
+
+<center style="margin-bottom: 20px;"><a href="https://github.com/TheirStack/data-engineer-2025-test">https://github.com/TheirStack/data-engineer-2025-test</a></center>
+
+
+<img src="./media/qr-gh-repo.png" data-preview-image style="max-height: 400px;">
+
+-- 
 
 ## Talk structure
 
