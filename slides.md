@@ -266,11 +266,6 @@ Besides row vs column approach, more trade-offs were made to make CH fast:
 
 <img src="./media/merges-2.png" data-preview-image style="max-height:600px;">
 
-----
-
-## ClickHouse: MergeTree
-
-<img src="./media/merge-tree.png" data-preview-image style="max-height:600px;">
 
 --
 
