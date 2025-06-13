@@ -50,7 +50,7 @@ Note:
 
 <img src="./media/qr-gh-repo.png" data-preview-image style="max-height: 400px;">
 
--- 
+--
 
 ## Talk structure
 
