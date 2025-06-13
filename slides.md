@@ -63,13 +63,14 @@ Note:
 ---
 
 
-### PostgreSQL: our hero journey
+### PostgreSQL: our journey
 
 1. 🙂 We add a field
 2. 😅 Users want to filter by it
 3. 🙄 No indices -> slow queries -> we add an index on that col
 4. 😵‍💫 Indices become larger than RAM -> we add more RAM
 5. 🤷‍♂️ RAM: 16GB -> 32GB -> 64GB. Barely no improvements
+6. 🥴 Updates, aggregations
 
 --
 
