@@ -198,20 +198,6 @@ CREATE INDEX CONCURRENTLY ix_job_easy_apply ON job (easy_apply);
 
 --
 
-## Use case: regex searches on job descriptions
-
-🥴 Approach 1: trigram indices. After 2M jobs - unfeasible.  
-```sql
-CREATE INDEX ix_job_description_trgm ON job USING gin (description  gin_trgm_ops)
-```
-👍 Approach 2: replicate jobs table in [Tinybird](https://tinybird.co/) and query IDs in Postgres
-```sql
-SELECT * FROM job WHERE id IN (...)
-```
-You can't pass more than 65535 parameters in a parameterized query in Postgres. Unnest works, but it's slow.
-
---
-
 ### Aggregations in Postgres: Materialized views
 
 - Large MVs are slow to calculate
@@ -231,6 +217,20 @@ RENAME company_technologies TO company_technologies_old;
 RENAME company_technologies_new TO company_technologies;
 COMMIT;
 ```
+
+--
+
+## Use case: regex searches on job descriptions
+
+🥴 Approach 1: trigram indices. After 2M jobs - unfeasible.  
+```sql
+CREATE INDEX ix_job_description_trgm ON job USING gin (description  gin_trgm_ops)
+```
+👍 Approach 2: replicate jobs table in [Tinybird](https://tinybird.co/) and query IDs in Postgres
+```sql
+SELECT * FROM job WHERE id IN (...)
+```
+You can't pass more than 65535 parameters in a parameterized query in Postgres. Unnest works, but it's slow.
 
 --
 
